@@ -18,8 +18,9 @@ def readGymExerciseCSV():
 def initialClean(gymExerciseDataFrame):
     # Remove unneeded columns.
     gymExerciseDataFrame = gymExerciseDataFrame.drop(columns=["Preparation","Execution","Force","Secondary Muscles",
-                                                                "Stabilizer_Muscles","Antagonist_Muscles",
-                                                                "Dynamic_Stabilizer_Muscles","parent_id","Difficulty (1-5)"])
+                                                                "Stabilizer_Muscles","Antagonist_Muscles","Variation",
+                                                                "Dynamic_Stabilizer_Muscles","parent_id",
+                                                                "Difficulty (1-5)","Utility"])
 
     # Standardize string values in all columns
     for column in gymExerciseDataFrame.columns:
@@ -30,10 +31,6 @@ def initialClean(gymExerciseDataFrame):
     # Clean up bad/invisible characters from all values.
     for column in gymExerciseDataFrame.columns:
         gymExerciseDataFrame[column] = gymExerciseDataFrame[column].apply(cleanBadCharacters)
-
-    # Remove all tuples in which there is a listed variation
-    gymExerciseDataFrame = gymExerciseDataFrame[gymExerciseDataFrame["Variation"].str.strip().str.lower() == "no"]
-    gymExerciseDataFrame = gymExerciseDataFrame.drop(columns="Variation")
 
     return gymExerciseDataFrame
 
@@ -145,7 +142,7 @@ def fixMuscleValues(gymExerciseDataFrame):
     return gymExerciseDataFrame
 
 # This function uses multi-hot encoding to represent the list of all muscles as features, rather than vague lists,
-# then removes the original muscles features. Assumes muscle values have been standardized.
+# then removes the original muscles features. Assumes muscle values have been fixed by fixMusclesValues.
 # Multi-hot encodes muscles with distinction:
 #     1 = Target muscle
 #     2 = Synergist muscle
@@ -174,6 +171,39 @@ def multiHotEncodeMuscles(gymExerciseDataFrame):
 
     return gymExerciseDataFrame
 
+# This function uses multi-hot encoding to represent the 'Equipment' column, creating a new column for each
+# unique equipment type. Removes the original 'Equipment' column after encoding, and merges all relevant duplicate
+# tuples.
+def multiHotEncodeAndMergeEquipment(gymExerciseDataFrame):
+    # Generate a set of all unique equipment values
+    uniqueEquipment = gymExerciseDataFrame["Equipment"].unique()
+
+    # Initialize new columns for each unique equipment type
+    for equipment in uniqueEquipment:
+        # Default to 0 for all rows
+        gymExerciseDataFrame[equipment] = 0
+
+    # Update the equipment columns with 1.0 where the equipment matches
+    for idx, row in gymExerciseDataFrame.iterrows():
+        equipment = row["Equipment"]
+        if equipment in uniqueEquipment:
+            gymExerciseDataFrame.at[idx, equipment] = 1
+
+    # Drop the original 'Equipment' column after encoding
+    gymExerciseDataFrame = gymExerciseDataFrame.drop(columns=["Equipment"])
+
+    # Merge rows that are identical except for equipment columns
+    # Identify columns that are not equipment columns (all other columns)
+    nonEquipmentColumns = [col for col in gymExerciseDataFrame.columns if col not in uniqueEquipment]
+
+    # Group by non-equipment columns and aggregate equipment columns
+    gymExerciseDataFrame = (
+        gymExerciseDataFrame.groupby(nonEquipmentColumns, as_index=False)
+        .sum()  # Sum the equipment columns to merge the multi-hot encodings
+    )
+
+    return gymExerciseDataFrame
+
 #endregion === Data Preprocessing ===
 #region === Reports ===
 
@@ -193,6 +223,7 @@ def getUniqueValuesInColumn(gymExerciseDataFrame,columnName,isValueList=False):
 # This function identifies unique values across all columns, including list columns, to detect unique values and
 # inconsistencies manually.
 def generateUniqueValueReport(gymExerciseDataFrame,blacklistColumns = None):
+    print(blacklistColumns)
     if(not blacklistColumns):
         blacklistColumns = []
 
@@ -255,12 +286,15 @@ def fullProcessData():
         gymExerciseDataFrame = deduplicateByLookup(gymExerciseDataFrame,variations=uniqueExercise,
                                                    targetColumn="Exercise Name",lookupColumns="Equipment")
 
+    # Now, we use multi-encoding on equipment.
+    uniqueEquipment = getUniqueValuesInColumn(gymExerciseDataFrame, columnName="Equipment", isValueList=False)
+    gymExerciseDataFrame = multiHotEncodeAndMergeEquipment(gymExerciseDataFrame)
 
-    generateUniqueValueReport(gymExerciseDataFrame,blacklistColumns=uniqueMuscles)
+    generateUniqueValueReport(gymExerciseDataFrame,blacklistColumns=list(uniqueMuscles) + list(uniqueEquipment))
     return gymExerciseDataFrame
 
 #endregion === Process ===
 
 df = fullProcessData()
-print(df.head(20).to_string())
-print(df[df["Exercise Name"].isin(["Leg Presses: 45° Leg Press"])].to_string())
+print(df.head(235).to_string())
+print(df[df["Exercise Name"].isin(["Squat"])].to_string())
