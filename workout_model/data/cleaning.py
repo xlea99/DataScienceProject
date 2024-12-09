@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+import io
 from workout_model.common.paths import paths
 from workout_model.util.utilities import fileStandardSortKey, cleanBadCharacters
 
@@ -204,6 +205,33 @@ def multiHotEncodeAndMergeEquipment(gymExerciseDataFrame):
 
     return gymExerciseDataFrame
 
+# This function applies manual exercise renaming as found in manual_exercise_renames.csv
+def applyManualExerciseRenaming(gymExerciseDataFrame):
+    datasetPath = paths["data"] / "manual_exercise_renames.csv"
+    manualExerciseRenaming = pd.read_csv(datasetPath)
+
+    # Filter manualExerciseRenaming to only rows where "NEW Name" is set (not NaN or empty)
+    manualExerciseRenaming = manualExerciseRenaming.dropna(subset=["NEW Name"])
+
+    # Merge the manual renaming dataframe into gymExerciseDataFrame on common columns
+    # We exclude the "NEW Name" column during the merge to avoid overwriting data
+    mergeColumns = [col for col in manualExerciseRenaming.columns if col != "NEW Name"]
+    gymExerciseDataFrame = gymExerciseDataFrame.merge(
+        manualExerciseRenaming[["NEW Name"] + mergeColumns],
+        on=mergeColumns,
+        how="left"
+    )
+
+    # Apply the renamings: If "NEW Name" is not null, replace the "Exercise Name" column
+    gymExerciseDataFrame["Exercise Name"] = gymExerciseDataFrame["NEW Name"].combine_first(gymExerciseDataFrame["Exercise Name"])
+
+    # Drop the "NEW Name" column as it's no longer needed
+    gymExerciseDataFrame = gymExerciseDataFrame.drop(columns=["NEW Name"])
+
+    return gymExerciseDataFrame
+
+
+
 #endregion === Data Preprocessing ===
 #region === Reports ===
 
@@ -223,7 +251,6 @@ def getUniqueValuesInColumn(gymExerciseDataFrame,columnName,isValueList=False):
 # This function identifies unique values across all columns, including list columns, to detect unique values and
 # inconsistencies manually.
 def generateUniqueValueReport(gymExerciseDataFrame,blacklistColumns = None):
-    print(blacklistColumns)
     if(not blacklistColumns):
         blacklistColumns = []
 
@@ -249,6 +276,22 @@ def generateUniqueValueReport(gymExerciseDataFrame,blacklistColumns = None):
             reportString += f"{uniqueValue}\n"
         with(open(uniquenessReportsPath / f"{column}.txt","w",encoding="utf-8") as f):
             f.write(reportString)
+
+# This function generates a report of remaining duplicate tuples that ARE meaningful, in that despite having the same
+# name, they hit different muscle groups and use different exercises, for the purpose of clarity and transparency.
+def generateDuplicateExerciseNameReport(gymExerciseDataFrame, groupColumns):
+    # Group by Exercise Name and check for differences across the grouping columns
+    grouped = gymExerciseDataFrame.groupby("Exercise Name")[groupColumns].nunique()
+
+    # Find exercises with more than 1 unique combination in the grouping columns
+    duplicates = grouped[grouped.gt(1).any(axis=1)]
+
+    # Filter the original dataframe to only include rows with duplicate Exercise Names
+    duplicateExercises = gymExerciseDataFrame[gymExerciseDataFrame["Exercise Name"].isin(duplicates.index)]
+
+    with open(paths["reports"] / "duplicateExerciseNameTuples.csv","w") as f:
+        f.write(duplicateExercises.to_csv())
+    return duplicateExercises
 
 #endregion === Reports ===
 
@@ -290,11 +333,14 @@ def fullProcessData():
     uniqueEquipment = getUniqueValuesInColumn(gymExerciseDataFrame, columnName="Equipment", isValueList=False)
     gymExerciseDataFrame = multiHotEncodeAndMergeEquipment(gymExerciseDataFrame)
 
+    # Finally, we apply any manual renaming changes as specified in manual_exercise_renames.csv
+    gymExerciseDataFrame = applyManualExerciseRenaming(gymExerciseDataFrame)
+
+    generateDuplicateExerciseNameReport(gymExerciseDataFrame, groupColumns=list(uniqueMuscles) + list(uniqueEquipment))
     generateUniqueValueReport(gymExerciseDataFrame,blacklistColumns=list(uniqueMuscles) + list(uniqueEquipment))
     return gymExerciseDataFrame
 
 #endregion === Process ===
 
 df = fullProcessData()
-print(df.head(235).to_string())
-print(df[df["Exercise Name"].isin(["Squat"])].to_string())
+print(df.head(20).to_string())
