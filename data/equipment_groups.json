@@ -13,8 +13,8 @@
     {
       "name": "Specific-Purpose Gym Machine",
       "entries": ["Lever","Lever (selectorized)","Lever (selectorized) Chest Dip","Lever (plate loaded)",
-      "Sled","Sled (selectorized)","Sled (plate loaded)","Assisted","Assisted (machine)","Assisted (partner)"],
-      "setupTime":0
+      "Sled","Sled (selectorized)","Sled (plate loaded)","Assisted (machine)","Assisted (partner)"],
+      "setupTime": 0
     },
     {
       "name": "Band",
