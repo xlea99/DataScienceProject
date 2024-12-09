@@ -1,0 +1,50 @@
+{
+  "groups": [
+    {
+      "name": "Cable Machine",
+      "entries": ["Cable","Cable (pull side)","Cable Standing Fly"],
+      "setupTime": 0
+    },
+    {
+      "name": "Smith",
+      "entries": ["Smith"],
+      "setupTime": 0
+    },
+    {
+      "name": "Specific-Purpose Gym Machine",
+      "entries": ["Lever","Lever (selectorized)","Lever (selectorized) Chest Dip","Lever (plate loaded)",
+      "Sled","Sled (selectorized)","Sled (plate loaded)","Assisted","Assisted (machine)","Assisted (partner)"],
+      "setupTime":0
+    },
+    {
+      "name": "Band",
+      "entries": ["Band Resistive","Band-assisted"],
+      "setupTime": 0
+    },
+    {
+      "name": "Plate-Weighted",
+      "entries": ["Weighted","Weighted Chest Dip"],
+      "setupTime": 0
+    },
+    {
+      "name": "No Equipment",
+      "entries": ["Body Weight","Isometric","Self-assisted"],
+      "setupTime": 0
+    },
+    {
+      "name": "Dumbbell",
+      "entries": ["Dumbbell"],
+      "setupTime": 0
+    },
+    {
+      "name": "Barbell",
+      "entries": ["Barbell"],
+      "setupTime": 0
+    },
+    {
+      "name": "Suspension Trainer",
+      "entries": ["Suspended","Suspension"],
+      "setupTime": 0
+    }
+  ]
+}

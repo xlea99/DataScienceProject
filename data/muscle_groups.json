@@ -1,0 +1,86 @@
+{
+  "groups": [
+    {
+      "name": "Back",
+      "entries": [
+        "Latissimus Dorsi",
+        "Posterior Deltoid",
+        "Rhomboids",
+        "Upper Trapezius",
+        "Middle Trapezius",
+        "Lower Trapezius",
+        "Teres Major",
+        "Teres Minor",
+        "Infraspinatus",
+        "Subscapularis"
+      ]
+    },
+    {
+      "name": "Calves",
+      "entries": [
+        "Soleus",
+        "Gastrocnemius",
+        "Tibialis Anterior"
+      ]
+    },
+    {
+      "name": "Chest",
+      "entries": [
+        "Pectoralis Major Clavicular",
+        "Pectoralis Major Sternal",
+        "Serratus Anterior"
+      ]
+    },
+    {
+      "name": "Forearm",
+      "entries": [
+        "Pronators",
+        "Supinator",
+        "Wrist Flexors",
+        "Wrist Extensors",
+        "Brachioradialis"
+      ]
+    },
+    {
+      "name": "Hips",
+      "entries": [
+        "Gluteus Maximus",
+        "Hip Flexors",
+        "Hip Abductors",
+        "Hip Adductors"
+      ]
+    },
+    {
+      "name": "Neck",
+      "entries": [
+        "Sternocleidomastoid",
+        "Splenius",
+        "Levator Scapulae"
+      ]
+    },
+    {
+      "name": "Shoulder",
+      "entries": [
+        "Anterior Deltoid",
+        "Lateral Deltoid",
+        "Posterior Deltoid",
+        "Supraspinatus"
+      ]
+    },
+    {
+      "name": "Thighs",
+      "entries": [
+        "Hamstrings",
+        "Quadriceps"
+      ]
+    },
+    {
+      "name": "Upper Arms",
+      "entries": [
+        "Biceps Brachii",
+        "Triceps Brachii",
+        "Brachialis"
+      ]
+    }
+  ]
+}

@@ -1,44 +1,42 @@
 import pandas as pd
 import os
-import io
+import json
 from workout_model.common.paths import paths
 from workout_model.util.utilities import fileStandardSortKey, cleanBadCharacters
-
-
 
 #region === Initial Cleaning ===
 
 # This function imports the raw gym exercise data into a pandas dataframe.
 def readGymExerciseCSV():
     datasetPath = paths["data"] / "gym_exercise_dataset.csv"
-    _rawGymExerciseDataFrame = pd.read_csv(datasetPath)
-    return _rawGymExerciseDataFrame
+    _rawexerciseDataFrame = pd.read_csv(datasetPath)
+    return _rawexerciseDataFrame
 
 # This function simply drops the unneeded columns from the dataframe, divides multi-entry cells into lists, and
 # removes columns listed as variations.
-def initialClean(gymExerciseDataFrame):
+def initialClean(exerciseDataFrame):
     # Remove unneeded columns.
-    gymExerciseDataFrame = gymExerciseDataFrame.drop(columns=["Preparation","Execution","Force","Secondary Muscles",
+    exerciseDataFrame = exerciseDataFrame.drop(columns=["Preparation","Execution","Force","Secondary Muscles",
                                                                 "Stabilizer_Muscles","Antagonist_Muscles","Variation",
                                                                 "Dynamic_Stabilizer_Muscles","parent_id",
                                                                 "Difficulty (1-5)","Utility"])
 
     # Standardize string values in all columns
-    for column in gymExerciseDataFrame.columns:
-        gymExerciseDataFrame[column] = gymExerciseDataFrame[column].apply(
+    for column in exerciseDataFrame.columns:
+        exerciseDataFrame[column] = exerciseDataFrame[column].apply(
             lambda x: ' '.join(str(x).split()) if pd.notnull(x) else x
         )
 
     # Clean up bad/invisible characters from all values.
-    for column in gymExerciseDataFrame.columns:
-        gymExerciseDataFrame[column] = gymExerciseDataFrame[column].apply(cleanBadCharacters)
+    for column in exerciseDataFrame.columns:
+        exerciseDataFrame[column] = exerciseDataFrame[column].apply(cleanBadCharacters)
 
-    return gymExerciseDataFrame
+    return exerciseDataFrame
 
 # This function standardizes all values within the dataframe that are given in variations to standard. For example,
 # if standard is "On", and variations is ["Active", "working", "on", "Not Off"], all values found equivalent to
 # variations will be converted to "On".
-def standardizeValue(_gymExerciseDataframe,standard : str,variations : (str,list), target_columns: list = None):
+def standardizeValue(_exerciseDataFrame,standard : str,variations : (str,list), target_columns: list = None):
     # Ensure variations is a list for consistent processing
     if(isinstance(variations, str)):
         variations = [variations]
@@ -54,15 +52,15 @@ def standardizeValue(_gymExerciseDataframe,standard : str,variations : (str,list
         return value
 
     # Apply the replacement function to all targeted columns in the DataFrame
-    columnsToProcess = target_columns if target_columns else _gymExerciseDataframe.columns
+    columnsToProcess = target_columns if target_columns else _exerciseDataFrame.columns
     for column in columnsToProcess:
-        _gymExerciseDataframe[column] = _gymExerciseDataframe[column].apply(replaceVariations)
+        _exerciseDataFrame[column] = _exerciseDataFrame[column].apply(replaceVariations)
 
-    return _gymExerciseDataframe
+    return _exerciseDataFrame
 
 # This method deduplicates tuples based on the uniqueness of lookupColumn(s) with a subset of rows, defined by
 # variations in the target_columns.
-def deduplicateByLookup(gymExerciseDataFrame, variations: (str, list), targetColumn: str, lookupColumns: (str, list)):
+def deduplicateByLookup(exerciseDataFrame, variations: (str, list), targetColumn: str, lookupColumns: (str, list)):
     # Ensure variations is a list
     if isinstance(variations, str):
         variations = [variations]
@@ -75,7 +73,7 @@ def deduplicateByLookup(gymExerciseDataFrame, variations: (str, list), targetCol
     variations = [v.strip().lower() for v in variations]
 
     # Step 1: Filter rows based on variations in the target_column
-    filtered_subset = gymExerciseDataFrame[gymExerciseDataFrame[targetColumn]
+    filtered_subset = exerciseDataFrame[exerciseDataFrame[targetColumn]
                                             .str.strip()
                                             .str.lower()
                                             .isin(variations)]
@@ -88,7 +86,7 @@ def deduplicateByLookup(gymExerciseDataFrame, variations: (str, list), targetCol
     deduplicated_subset = filtered_subset.drop_duplicates(subset=lookupColumns)
 
     # Step 3: Merge the deduplicated subset with the rest of the original dataframe
-    remaining_data = gymExerciseDataFrame[~gymExerciseDataFrame.index.isin(filtered_subset.index)]
+    remaining_data = exerciseDataFrame[~exerciseDataFrame.index.isin(filtered_subset.index)]
     result_df = pd.concat([remaining_data, deduplicated_subset])
 
     return result_df
@@ -98,16 +96,16 @@ def deduplicateByLookup(gymExerciseDataFrame, variations: (str, list), targetCol
 
 # This function removes all tuples that contain equipments we don't want to worry about presenting to the user
 # (assisted, plyometric)
-def removeBadEquipment(gymExerciseDataFrame):
+def removeBadEquipment(exerciseDataFrame):
     badEquipmentTypes = ["Assisted","Assisted (Partner)","Assisted Chest Dip","Plyometric"]
-    return gymExerciseDataFrame[~gymExerciseDataFrame["Equipment"].isin(badEquipmentTypes)]
+    return exerciseDataFrame[~exerciseDataFrame["Equipment"].isin(badEquipmentTypes)]
 
 #endregion === Data Removal ===
 #region === Data Preprocessing ===
 
 # This method standardizes muscle values for further processing, fixing bad commas, spacing, and representing them
 # as lists.
-def fixMuscleValues(gymExerciseDataFrame):
+def fixMuscleValues(exerciseDataFrame):
     # Some muscles were inconsistently stored with commas in them - this helper method corrects it.
     def applyMuscleCorrections(muscle_string):
         muscle_corrections = {"Trapezius, Upper": "Upper Trapezius",
@@ -130,17 +128,17 @@ def fixMuscleValues(gymExerciseDataFrame):
     # First, we apply some corrections due to inconsistent comma inclusion in the dataset
     columnsToProcess = ["Target_Muscles", "Synergist_Muscles"]
     for column in columnsToProcess:
-        gymExerciseDataFrame[column] = gymExerciseDataFrame[column].apply(
+        exerciseDataFrame[column] = exerciseDataFrame[column].apply(
             lambda x: applyMuscleCorrections(x)
         )
 
     # Now we process our muscle columns, which may contain, multiple values into lists.
     for column in columnsToProcess:
-        gymExerciseDataFrame[column] = gymExerciseDataFrame[column].apply(
+        exerciseDataFrame[column] = exerciseDataFrame[column].apply(
             lambda x: [item.strip() for item in str(x).split(",") if item.strip()] if pd.notnull(x) else []
         )
 
-    return gymExerciseDataFrame
+    return exerciseDataFrame
 
 # This function uses multi-hot encoding to represent the list of all muscles as features, rather than vague lists,
 # then removes the original muscles features. Assumes muscle values have been fixed by fixMusclesValues.
@@ -148,98 +146,142 @@ def fixMuscleValues(gymExerciseDataFrame):
 #     1 = Target muscle
 #     2 = Synergist muscle
 #     0 = None
-def multiHotEncodeMuscles(gymExerciseDataFrame):
+def multiHotEncodeMuscles(exerciseDataFrame):
     # Generate a set of all unique muscles values in ONLY Target_Muscles.
-    uniqueMuscles = getUniqueValuesInColumn(gymExerciseDataFrame,columnName="Target_Muscles",isValueList=True)
+    uniqueMuscles = getUniqueValuesInColumn(exerciseDataFrame,columnName="Target_Muscles",isValueList=True)
 
     # Initialize new columns for each unique muscle
     for muscle in uniqueMuscles:
-        gymExerciseDataFrame[muscle] = 0.0  # Default to 0 for all rows
+        exerciseDataFrame[muscle] = 0.0  # Default to 0 for all rows
 
     # Update each muscle column based on primary and secondary muscles
-    for idx, row in gymExerciseDataFrame.iterrows():
+    for idx, row in exerciseDataFrame.iterrows():
         targetMuscles = row["Target_Muscles"]
         synergistMuscles = row["Synergist_Muscles"]
 
         for muscle in uniqueMuscles:
             if muscle in targetMuscles:
-                gymExerciseDataFrame.at[idx, muscle] = 1.0  # Primary muscle
+                exerciseDataFrame.at[idx, muscle] = 1.0  # Primary muscle
             elif muscle in synergistMuscles:
-                gymExerciseDataFrame.at[idx, muscle] = 0.5  # Secondary muscle
+                exerciseDataFrame.at[idx, muscle] = 0.5  # Secondary muscle
 
     # Drop the original muscle columns
-    gymExerciseDataFrame = gymExerciseDataFrame.drop(columns=["Target_Muscles", "Synergist_Muscles"])
+    exerciseDataFrame = exerciseDataFrame.drop(columns=["Target_Muscles", "Synergist_Muscles"])
 
-    return gymExerciseDataFrame
+    return exerciseDataFrame
 
 # This function uses multi-hot encoding to represent the 'Equipment' column, creating a new column for each
 # unique equipment type. Removes the original 'Equipment' column after encoding, and merges all relevant duplicate
 # tuples.
-def multiHotEncodeAndMergeEquipment(gymExerciseDataFrame):
+def multiHotEncodeAndMergeEquipment(exerciseDataFrame):
     # Generate a set of all unique equipment values
-    uniqueEquipment = gymExerciseDataFrame["Equipment"].unique()
+    uniqueEquipment = exerciseDataFrame["Equipment"].unique()
 
     # Initialize new columns for each unique equipment type
     for equipment in uniqueEquipment:
         # Default to 0 for all rows
-        gymExerciseDataFrame[equipment] = 0
+        exerciseDataFrame[equipment] = 0
 
     # Update the equipment columns with 1.0 where the equipment matches
-    for idx, row in gymExerciseDataFrame.iterrows():
+    for idx, row in exerciseDataFrame.iterrows():
         equipment = row["Equipment"]
         if equipment in uniqueEquipment:
-            gymExerciseDataFrame.at[idx, equipment] = 1
+            exerciseDataFrame.at[idx, equipment] = 1
 
     # Drop the original 'Equipment' column after encoding
-    gymExerciseDataFrame = gymExerciseDataFrame.drop(columns=["Equipment"])
+    exerciseDataFrame = exerciseDataFrame.drop(columns=["Equipment"])
 
     # Merge rows that are identical except for equipment columns
     # Identify columns that are not equipment columns (all other columns)
-    nonEquipmentColumns = [col for col in gymExerciseDataFrame.columns if col not in uniqueEquipment]
+    nonEquipmentColumns = [col for col in exerciseDataFrame.columns if col not in uniqueEquipment]
 
     # Group by non-equipment columns and aggregate equipment columns
-    gymExerciseDataFrame = (
-        gymExerciseDataFrame.groupby(nonEquipmentColumns, as_index=False)
+    exerciseDataFrame = (
+        exerciseDataFrame.groupby(nonEquipmentColumns, as_index=False)
         .sum()  # Sum the equipment columns to merge the multi-hot encodings
     )
 
-    return gymExerciseDataFrame
+    return exerciseDataFrame
 
 # This function applies manual exercise renaming as found in manual_exercise_renames.csv
-def applyManualExerciseRenaming(gymExerciseDataFrame):
+def applyManualExerciseRenaming(exerciseDataFrame):
     datasetPath = paths["data"] / "manual_exercise_renames.csv"
     manualExerciseRenaming = pd.read_csv(datasetPath)
 
     # Filter manualExerciseRenaming to only rows where "NEW Name" is set (not NaN or empty)
     manualExerciseRenaming = manualExerciseRenaming.dropna(subset=["NEW Name"])
 
-    # Merge the manual renaming dataframe into gymExerciseDataFrame on common columns
+    # Merge the manual renaming dataframe into exerciseDataFrame on common columns
     # We exclude the "NEW Name" column during the merge to avoid overwriting data
     mergeColumns = [col for col in manualExerciseRenaming.columns if col != "NEW Name"]
-    gymExerciseDataFrame = gymExerciseDataFrame.merge(
+    exerciseDataFrame = exerciseDataFrame.merge(
         manualExerciseRenaming[["NEW Name"] + mergeColumns],
         on=mergeColumns,
         how="left"
     )
 
     # Apply the renamings: If "NEW Name" is not null, replace the "Exercise Name" column
-    gymExerciseDataFrame["Exercise Name"] = gymExerciseDataFrame["NEW Name"].combine_first(gymExerciseDataFrame["Exercise Name"])
+    exerciseDataFrame["Exercise Name"] = exerciseDataFrame["NEW Name"].combine_first(exerciseDataFrame["Exercise Name"])
 
     # Drop the "NEW Name" column as it's no longer needed
-    gymExerciseDataFrame = gymExerciseDataFrame.drop(columns=["NEW Name"])
+    exerciseDataFrame = exerciseDataFrame.drop(columns=["NEW Name"])
 
-    return gymExerciseDataFrame
+    return exerciseDataFrame
 
 
 
 #endregion === Data Preprocessing ===
+#region === Data Enrichment ===
+
+# Adds in values (from research) on both the equipment category, and the setup times associated with them.
+def addEquipmentGroupsAndTimes(equipmentDataFrame):
+    # First, read the equipment_groups.json file
+    with open(paths["data"] / "equipment_groups.json","r") as f:
+        equipmentGroups = json.load(f)
+
+    # Add columns for the group name and setup time
+    equipmentDataFrame["Equipment Group"] = None
+    equipmentDataFrame["Setup Time"] = None
+
+    # Iterate through each group and its entries
+    for equipmentGroup in equipmentGroups["groups"]:
+        groupName = equipmentGroup["name"]
+        setupTime = equipmentGroup["setupTime"]
+
+        for equipmentType in equipmentGroup["entries"]:
+            # Find rows matching the current equipmentType and update their group and setup time
+            equipmentDataFrame.loc[equipmentDataFrame["Equipment"] == equipmentType, "Equipment Group"] = groupName
+            equipmentDataFrame.loc[equipmentDataFrame["Equipment"] == equipmentType, "Setup Time"] = setupTime
+
+    return equipmentDataFrame
+
+# Adds in values (from research) for muscle groups, based on the individual muscle.
+def addMuscleGroups(muscleDataFrame):
+    # First, read the equipment_groups.json file
+    with open(paths["data"] / "muscle_groups.json", "r") as f:
+        muscleGroups = json.load(f)
+
+    # Add columns for the group name and setup time
+    muscleDataFrame["Muscle Group"] = None
+
+    # Iterate through each group and its entries
+    for muscleGroup in muscleGroups["groups"]:
+        groupName = muscleGroup["name"]
+
+        for equipmentType in muscleGroup["entries"]:
+            # Find rows matching the current equipmentType and update their group and setup time
+            muscleDataFrame.loc[muscleDataFrame["Muscle"] == equipmentType, "Muscle Group"] = groupName
+
+    return muscleDataFrame
+
+#endregion === Data Enrichment ===
 #region === Reports ===
 
 # This function generates a list of all unique values in the given column. isValueList accommodates for when the values
 # of a column are in list form, rather than string.
-def getUniqueValuesInColumn(gymExerciseDataFrame,columnName,isValueList=False):
+def getUniqueValuesInColumn(exerciseDataFrame,columnName,isValueList=False):
     uniqueValues = set()
-    for idx, row in gymExerciseDataFrame.iterrows():
+    for idx, row in exerciseDataFrame.iterrows():
         value = row[columnName]
         if(isValueList):
             for subValue in value:
@@ -250,7 +292,7 @@ def getUniqueValuesInColumn(gymExerciseDataFrame,columnName,isValueList=False):
 
 # This function identifies unique values across all columns, including list columns, to detect unique values and
 # inconsistencies manually.
-def generateUniqueValueReport(gymExerciseDataFrame,blacklistColumns = None):
+def generateUniqueValueReport(exerciseDataFrame,blacklistColumns = None):
     if(not blacklistColumns):
         blacklistColumns = []
 
@@ -260,11 +302,11 @@ def generateUniqueValueReport(gymExerciseDataFrame,blacklistColumns = None):
         os.mkdir(uniquenessReportsPath)
 
     # Loop through and report on all columns
-    for column in gymExerciseDataFrame.columns:
+    for column in exerciseDataFrame.columns:
         if(column in blacklistColumns):
             continue
         # Temporarily convert list-like columns to strings for processing
-        tempColumn = gymExerciseDataFrame[column].apply(
+        tempColumn = exerciseDataFrame[column].apply(
             lambda x: ', '.join(x) if isinstance(x, list) else x
         )
         # Generate the sorted list of unique values
@@ -279,15 +321,15 @@ def generateUniqueValueReport(gymExerciseDataFrame,blacklistColumns = None):
 
 # This function generates a report of remaining duplicate tuples that ARE meaningful, in that despite having the same
 # name, they hit different muscle groups and use different exercises, for the purpose of clarity and transparency.
-def generateDuplicateExerciseNameReport(gymExerciseDataFrame, groupColumns):
+def generateDuplicateExerciseNameReport(exerciseDataFrame, groupColumns):
     # Group by Exercise Name and check for differences across the grouping columns
-    grouped = gymExerciseDataFrame.groupby("Exercise Name")[groupColumns].nunique()
+    grouped = exerciseDataFrame.groupby("Exercise Name")[groupColumns].nunique()
 
     # Find exercises with more than 1 unique combination in the grouping columns
     duplicates = grouped[grouped.gt(1).any(axis=1)]
 
     # Filter the original dataframe to only include rows with duplicate Exercise Names
-    duplicateExercises = gymExerciseDataFrame[gymExerciseDataFrame["Exercise Name"].isin(duplicates.index)]
+    duplicateExercises = exerciseDataFrame[exerciseDataFrame["Exercise Name"].isin(duplicates.index)]
 
     with open(paths["reports"] / "duplicateExerciseNameTuples.csv","w") as f:
         f.write(duplicateExercises.to_csv())
@@ -295,52 +337,77 @@ def generateDuplicateExerciseNameReport(gymExerciseDataFrame, groupColumns):
 
 #endregion === Reports ===
 
-
-
-#region === Process ===
+#region === Data Processing ===
 
 # Main function to read and pre-process the data to a ready state.
 def fullProcessData():
-    gymExerciseDataFrame = readGymExerciseCSV()
-    gymExerciseDataFrame = initialClean(gymExerciseDataFrame)
 
-    gymExerciseDataFrame = removeBadEquipment(gymExerciseDataFrame)
-    gymExerciseDataFrame = fixMuscleValues(gymExerciseDataFrame)
-    uniqueMuscles = getUniqueValuesInColumn(gymExerciseDataFrame, columnName="Target_Muscles", isValueList=True)
-    gymExerciseDataFrame = multiHotEncodeMuscles(gymExerciseDataFrame)
+    #region === Exercise Data Frame ===
+
+    exerciseDataFrame = readGymExerciseCSV()
+    exerciseDataFrame = initialClean(exerciseDataFrame)
+
+    exerciseDataFrame = removeBadEquipment(exerciseDataFrame)
+    exerciseDataFrame = fixMuscleValues(exerciseDataFrame)
+    uniqueMuscles = getUniqueValuesInColumn(exerciseDataFrame, columnName="Target_Muscles", isValueList=True)
+    exerciseDataFrame = multiHotEncodeMuscles(exerciseDataFrame)
 
     # Here, we use deduplication to remove (as defined by our research) distinction-less exercise tuples from the data.
     # We reference "grouped_exercises.txt", which is a document we prepared using generated uniqueness reports to group
     # reasonably similar exercises together, and then let our algorithm detect which tuples are worth preserving and
     # which can be dropped.
-
     groupedExercises = []
     with open(paths["data"] / "grouped_exercises.txt","r") as f:
         for line in f:
             groupedExercises.append([thisExercise.strip() for thisExercise in line.split(",")])
     for groupedExercise in groupedExercises:
-        gymExerciseDataFrame = deduplicateByLookup(gymExerciseDataFrame,variations=groupedExercise,
+        exerciseDataFrame = deduplicateByLookup(exerciseDataFrame,variations=groupedExercise,
                                                    targetColumn="Exercise Name",lookupColumns=["Equipment"] + list(uniqueMuscles))
 
     # Now, we run a second batch of deduplication to remove "ambiguous" exercises, where the name and equipment are
     # identical, yet muscle groups are different.
-    uniqueExercises = getUniqueValuesInColumn(gymExerciseDataFrame, columnName="Exercise Name", isValueList=False)
+    uniqueExercises = getUniqueValuesInColumn(exerciseDataFrame, columnName="Exercise Name", isValueList=False)
     for uniqueExercise in uniqueExercises:
-        gymExerciseDataFrame = deduplicateByLookup(gymExerciseDataFrame,variations=uniqueExercise,
+        exerciseDataFrame = deduplicateByLookup(exerciseDataFrame,variations=uniqueExercise,
                                                    targetColumn="Exercise Name",lookupColumns="Equipment")
 
     # Now, we use multi-encoding on equipment.
-    uniqueEquipment = getUniqueValuesInColumn(gymExerciseDataFrame, columnName="Equipment", isValueList=False)
-    gymExerciseDataFrame = multiHotEncodeAndMergeEquipment(gymExerciseDataFrame)
+    uniqueEquipment = getUniqueValuesInColumn(exerciseDataFrame, columnName="Equipment", isValueList=False)
+    exerciseDataFrame = multiHotEncodeAndMergeEquipment(exerciseDataFrame)
 
     # Finally, we apply any manual renaming changes as specified in manual_exercise_renames.csv
-    gymExerciseDataFrame = applyManualExerciseRenaming(gymExerciseDataFrame)
+    exerciseDataFrame = applyManualExerciseRenaming(exerciseDataFrame)
 
-    generateDuplicateExerciseNameReport(gymExerciseDataFrame, groupColumns=list(uniqueMuscles) + list(uniqueEquipment))
-    generateUniqueValueReport(gymExerciseDataFrame,blacklistColumns=list(uniqueMuscles) + list(uniqueEquipment))
-    return gymExerciseDataFrame
+    # Also, rename "Main_muscle" to "Muscle Group" for consistency
+    exerciseDataFrame.rename(columns={'Main_muscle': 'Muscle Group'}, inplace=True)
 
-#endregion === Process ===
+    generateDuplicateExerciseNameReport(exerciseDataFrame, groupColumns=list(uniqueMuscles) + list(uniqueEquipment))
+    generateUniqueValueReport(exerciseDataFrame,blacklistColumns=list(uniqueMuscles) + list(uniqueEquipment))
 
-df = fullProcessData()
-print(df.head(20).to_string())
+    #endregion === Exercise Data Frame ===
+
+    #region === Other Data Frames
+
+    muscleDataFrame = pd.DataFrame(uniqueMuscles, columns=["Muscle"])
+    equipmentDataFrame = pd.DataFrame(uniqueEquipment, columns=["Equipment"])
+
+    # Add in equipment group/setup time data
+    equipmentDataFrame = addEquipmentGroupsAndTimes(equipmentDataFrame)
+
+    # Add in muscle group data
+    muscleDataFrame = addMuscleGroups(muscleDataFrame)
+
+    #endregion === Other Data Frames
+
+    return exerciseDataFrame, muscleDataFrame, equipmentDataFrame
+
+#endregion === Data Processing ===
+
+exercises, muscles, equipment = fullProcessData()
+
+print(exercises.head(10).to_string())
+print("===============================")
+print(muscles.to_string())
+print("===============================")
+print(equipment.to_string())
+print("===============================")
