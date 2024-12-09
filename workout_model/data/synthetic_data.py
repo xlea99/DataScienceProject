@@ -1,4 +1,3 @@
-from workout_model.data.preparation import fullProcessData
 import random
 import math
 
@@ -64,7 +63,6 @@ def genSyntheticDay(exerciseDataFrame,musclesDataFrame,equipmentDataFrame,time,m
     while total_time < time:
         # Break if too many attempts have been made
         if attempts >= max_attempts:
-            print("Max attempts reached. Ending routine generation.")
             break
 
         # Step 1: Attempt to target the least-utilized muscle
@@ -302,13 +300,23 @@ def genRandomUserInput(exerciseDataFrame, equipmentDataFrame):
     base_max_threshold = random.randrange(5,14) if random.randrange(1,6) == 1 else 8.0
     target_sets_per_muscle = random.randrange(8,24) if random.randrange(1,6) == 1 else 18.0
 
-    return {
+    returnDict = {
         "time_per_day": time_per_day,
         "equipment_per_day": equipment_per_day,
         "blacklist_per_day": blacklist_per_day,
         "base_max_threshold": base_max_threshold,
         "target_sets_per_muscle": target_sets_per_muscle,
     }
+
+    for day in days_of_week:
+        if(not returnDict["time_per_day"].get(day,None)):
+            returnDict["time_per_day"][day] = 0
+        if (not returnDict["equipment_per_day"].get(day, None)):
+            returnDict["equipment_per_day"][day] = []
+        if (not returnDict["blacklist_per_day"].get(day, None)):
+            returnDict["blacklist_per_day"][day] = []
+
+    return returnDict
 
 #endregion === Synthetic Generators ===
 #region === Displays ===
@@ -432,17 +440,3 @@ def display_weekly_schedule(week_schedule, musclesDataFrame):
     print("=" * 50)
 
 #endregion === Displays ===
-
-exercisesDF, musclesDF, equipmentDF = fullProcessData()
-
-
-for i in range(50):
-    userInput = genRandomUserInput(exercisesDF,equipmentDF)
-    routine = genSyntheticWeek(exercisesDF,musclesDF,equipmentDF,time_per_day=userInput["time_per_day"],
-                               equipment_per_day=userInput["equipment_per_day"],
-                               blacklist_per_day=userInput["blacklist_per_day"],
-                               base_max_threshold=userInput["base_max_threshold"],
-                               target_sets_per_muscle=userInput["target_sets_per_muscle"])
-    print(userInput)
-    display_weekly_schedule(routine,musclesDataFrame=musclesDF)
-    print("\n\n\n\n")

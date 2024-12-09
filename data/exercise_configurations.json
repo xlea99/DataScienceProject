@@ -2,39 +2,39 @@
   "groups": [
     {
       "name": "45\u00b0 Calf Press",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "45\u00b0 Calf Raise",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "45\u00b0 Reverse Calf Press",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "45\u00b0 Reverse Calf Raise",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "45\u00b0 Reverse Calf Raise (on hack press)",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "45\u00b0 Reverse Calf Raise (plate loaded)",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Alternating Curl",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Archer Pull-up",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Arm Curl",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Arnold Press",
@@ -46,35 +46,35 @@
     },
     {
       "name": "Band-Assist Chest Dip",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Bench Dip",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Bench Press",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Bent Knee Good-morning",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Bent-over Leg Curl",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Bent-over Pullover",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Bent-over Row",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Bent-over Triceps Extension",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Cable Glute Kickback",
@@ -90,35 +90,35 @@
     },
     {
       "name": "Chest Dip",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Chest Press",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Chin-up",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Close Grip Bench Press",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Close Grip Pulldown",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Close Grip Push-up",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Concentration Curl",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Curl",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Deadlift",
@@ -126,7 +126,7 @@
     },
     {
       "name": "Deadlift: Stiff-leg Deadlift Straight-back",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Deadlifts",
@@ -134,7 +134,7 @@
     },
     {
       "name": "Deadlifts: Stiff-leg Deadlift Straight-back",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Decline Bench Press",
@@ -150,7 +150,7 @@
     },
     {
       "name": "Decline Sit-up",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Discs",
@@ -158,27 +158,27 @@
     },
     {
       "name": "Donkey Calf Raise",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Dumbbell Pullover",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Flies",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Flies: Seated Fly",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Flies: Standing Fly",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Fly",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Forward Angled Single Leg Calf Raise",
@@ -190,7 +190,7 @@
     },
     {
       "name": "Front Pulldown",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Front Raise",
@@ -218,11 +218,11 @@
     },
     {
       "name": "Glute-Ham Raise",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Good-morning",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Grip",
@@ -238,7 +238,7 @@
     },
     {
       "name": "Hammer Curl",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Hamstring Raise",
@@ -258,7 +258,7 @@
     },
     {
       "name": "Hip Adduction",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Hip Bridge",
@@ -278,35 +278,35 @@
     },
     {
       "name": "Hip Thrust",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Hyperextension",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Hyperextension (45\u00b0)",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Incline Bench Press",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Incline Chest Press",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Incline Curl",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Incline Fly",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Incline Lateral Raise",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Incline Leg Raise",
@@ -314,7 +314,7 @@
     },
     {
       "name": "Incline Row",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Incline Shoulder Raise",
@@ -326,7 +326,7 @@
     },
     {
       "name": "Inverse Leg Curl",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Inverted Biceps Row",
@@ -350,11 +350,11 @@
     },
     {
       "name": "Kneeling Leg Curl",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Lateral Neck Flexion",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Lateral Raise",
@@ -362,19 +362,19 @@
     },
     {
       "name": "Leg Curl",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Leg Extension",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Leg Presses",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Leg Presses: 45\u00b0 Leg Press",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Leg Raises",
@@ -382,11 +382,11 @@
     },
     {
       "name": "Lunge",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Lunge: Rear Lunge",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Lying Calf Press",
@@ -406,11 +406,11 @@
     },
     {
       "name": "Lying Lateral Raise",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Lying Leg Curl",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Lying Leg Raise",
@@ -422,7 +422,7 @@
     },
     {
       "name": "Lying Rear Lateral Raise",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Lying Reverse Calf Press",
@@ -430,7 +430,7 @@
     },
     {
       "name": "Lying Row",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Lying Shoulder External Rotation",
@@ -438,31 +438,31 @@
     },
     {
       "name": "Lying Triceps Extension",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Machine Flies",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Machine Incline Fly",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Machine Pulldown",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Machine Pullover",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Military Press",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Military Press: Seated",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Mountain Climber",
@@ -470,11 +470,11 @@
     },
     {
       "name": "Neck Extension",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Neck Flexion",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Neck Retraction",
@@ -486,7 +486,7 @@
     },
     {
       "name": "One Arm Pull-up New!",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "One Arm Straight Back Seated High Row",
@@ -494,7 +494,7 @@
     },
     {
       "name": "One Arm Triceps Extension (on bench)",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "One Hand",
@@ -526,31 +526,31 @@
     },
     {
       "name": "Prone Incline Curl",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Pull-up",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Pull-up (open-centered bar)",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Pull-up: Self-assisted",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Pulldown",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Pullup/Chinup",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Pullup/Chinup: Pull-up",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Push-up",
@@ -562,15 +562,15 @@
     },
     {
       "name": "Pushdown",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Rear Delt Inverted Row (high bar)",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Rear Delt Row",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Rear Lateral Raise",
@@ -578,7 +578,7 @@
     },
     {
       "name": "Rear Lunge",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Reclined Shoulder Press",
@@ -590,7 +590,7 @@
     },
     {
       "name": "Reverse Calf Raise",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Reverse Curl",
@@ -602,7 +602,7 @@
     },
     {
       "name": "Reverse Hyper-extension",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Reverse Wrist Curl",
@@ -614,15 +614,15 @@
     },
     {
       "name": "Row",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Safety Bar Reverse Calf Raise",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Safety Barbell Seated Calf Raise",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Scissor Kick",
@@ -634,7 +634,7 @@
     },
     {
       "name": "Seated Calf Raise",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Seated Hip Abduction",
@@ -642,7 +642,7 @@
     },
     {
       "name": "Seated Hip Adduction",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Seated Hip Internal Rotation",
@@ -650,7 +650,7 @@
     },
     {
       "name": "Seated Leg Curl",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Seated Leg Raise",
@@ -658,7 +658,7 @@
     },
     {
       "name": "Seated Neck Extension",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Seated Pronation",
@@ -666,7 +666,7 @@
     },
     {
       "name": "Seated Rear Delt Row",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Seated Rear Lateral Raise",
@@ -682,11 +682,11 @@
     },
     {
       "name": "Seated Row",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Seated Rows",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Seated Shoulder External Rotation",
@@ -702,7 +702,7 @@
     },
     {
       "name": "Seated Wide Grip Row",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Seated Wide Grip Row: Straight Back",
@@ -722,7 +722,7 @@
     },
     {
       "name": "Shoulder Press",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Shoulder Press: Parallel Grip",
@@ -742,11 +742,11 @@
     },
     {
       "name": "Single Leg 45\u00b0 Hyperextension",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Single Leg Calf Raise",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Single Leg Hanging Hamstring Bridge",
@@ -754,47 +754,47 @@
     },
     {
       "name": "Single Leg Split Squat",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Single Leg Squat",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Single Leg Squat (leg wrapped)",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Single Leg Squat (plate loaded)",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Single Leg Stiff Leg Deadlift",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Split Squat",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Squat",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Squat (quad focus)",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Standing Calf Raise",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Standing Chest Dip",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Standing Fly",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Standing Hip Abduction",
@@ -810,7 +810,7 @@
     },
     {
       "name": "Standing Leg Curl",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Standing Leg Raise",
@@ -822,7 +822,7 @@
     },
     {
       "name": "Standing Triceps Dip",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Step Down",
@@ -834,7 +834,7 @@
     },
     {
       "name": "Stiff-leg Deadlift",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Straight Hip Leg Curl",
@@ -846,11 +846,11 @@
     },
     {
       "name": "Straight-back Straight-leg Deadlift",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Straight-leg Deadlift",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Suspended Neck Extension",
@@ -862,15 +862,15 @@
     },
     {
       "name": "Suspension Pull-up",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "T-bar Row",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "T-bar Row: Close grip",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Trap Bar Shrug",
@@ -878,11 +878,11 @@
     },
     {
       "name": "Triceps Dip",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Triceps Extension",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Twist",
@@ -890,11 +890,11 @@
     },
     {
       "name": "Underhand Pulldown",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Underhand Seated Row",
-      "stretch_factor": 0.0
+      "stretch_factor": 0.5
     },
     {
       "name": "Upright Row",
@@ -906,7 +906,7 @@
     },
     {
       "name": "V-Squat",
-      "stretch_factor": 0.0
+      "stretch_factor": 1.0
     },
     {
       "name": "Vertical Leg Raise",
