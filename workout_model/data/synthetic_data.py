@@ -122,7 +122,6 @@ def genSyntheticWeek(exerciseDataFrame,musclesDataFrame,equipmentDataFrame,
         time_per_day,  # Dictionary: {"Monday": 45, "Tuesday": 30, ...}
         equipment_per_day,  # Dictionary: {"Monday": ["Dumbbell", ...], ...}
         blacklist_per_day,  # Dictionary: {"Monday": ["Push-up", ...], ...}
-        total_weekly_time_limit=None,  # Optional total weekly time limit
         base_max_threshold=8.0,  # Default daily threshold
         target_sets_per_muscle=18):  # Target weekly sets per muscle
     # Days of the week
@@ -210,6 +209,106 @@ def genSyntheticWeek(exerciseDataFrame,musclesDataFrame,equipmentDataFrame,
                                                    exerciseBlacklist=week_schedule[day]["exerciseBlacklist"])
 
     return week_schedule
+
+# This method generates a random single user's input variables for use with the genSyntheticWeek generator.
+def genRandomUserInput(exerciseDataFrame, equipmentDataFrame):
+    # 1. Days available
+    days_of_week = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    num_days_available = random.randint(1, 7)  # Randomly pick number of workout days
+    active_days = random.sample(days_of_week, num_days_available)  # Randomly select active days
+
+    # 2. User attributes: time volatility and baseline time availability
+    time_volatility = random.randint(0, 5)  # 0 = very consistent, 5 = highly variable
+    baseline_time_free = random.randint(1, 5)  # 1 = low time available, 5 = ample time available
+
+    # Generate time_per_day based on volatility and baseline
+    time_per_day = {}
+    for day in days_of_week:
+        if day in active_days:
+            base_time = baseline_time_free * 15  # Base time in minutes (e.g., 15-75 mins)
+            if time_volatility == 0:
+                time_available = base_time
+            else:
+                time_available = max(15, base_time + random.randint(-10 * time_volatility, 10 * time_volatility))
+            time_per_day[day] = time_available
+        else:
+            time_per_day[day] = 0  # No workout on this day
+
+    # 3. Equipment availability per day
+    no_equipment = ["Body Weight", "Isometric", "Self-assisted"]
+    isNoEquipmentUser = random.randrange(1,5) == 1
+    isUnrelatedEquipmentUser = random.randrange(1, 6) == 1
+    isConsistentEquipmentUser = random.randrange(1,4) != 1
+    consistentEquipment = set()
+    consistentEquipmentHasBeenGenerated = False
+    equipment_groups = equipmentDataFrame["Equipment"].unique().tolist()
+    equipment_per_day = {}
+
+    for day in days_of_week:
+        if day in active_days:
+            # Always include no-equipment group
+            day_equipment = set(no_equipment)
+
+            if(not isNoEquipmentUser):
+                # Add 1-4 equipment groups
+                num_groups = random.randint(1, 4)
+                selected_groups = random.sample(equipment_groups, num_groups)
+                if(isConsistentEquipmentUser):
+                    if(consistentEquipmentHasBeenGenerated):
+                        day_equipment.union(consistentEquipment)
+                    else:
+                        consistentEquipment.update(selected_groups)
+                        day_equipment.union(consistentEquipment)
+                else:
+                    day_equipment.update(selected_groups)
+
+            if (isUnrelatedEquipmentUser):
+                # Add 1-5 random standalone equipment for variety
+                standalone_equipment = random.sample(equipment_groups, random.randint(1, 5))
+                if(isConsistentEquipmentUser):
+                    consistentEquipment.update(standalone_equipment)
+                    day_equipment.union(consistentEquipment)
+                else:
+                    day_equipment.union(standalone_equipment)
+
+            equipment_per_day[day] = list(day_equipment)
+        else:
+            equipment_per_day[day] = []
+
+    # 4. Exercise blacklists per day
+    blacklist_neediness = random.randint(0, 3)  # 0 = no blacklist, 3 = very needy
+    blacklist_per_day = {}
+
+    if blacklist_neediness == 0:
+        # No blacklist
+        blacklist_per_day = {day: [] for day in days_of_week}
+    else:
+        # Generate blacklists
+        all_exercises = exerciseDataFrame["Exercise Name"].unique().tolist()
+        uniform_blacklist = random.random() > 0.5  # 50% chance for uniform blacklist
+
+        if uniform_blacklist:
+            common_blacklist = random.sample(all_exercises, random.randint(5, 15))
+            for day in days_of_week:
+                blacklist_per_day[day] = common_blacklist if day in active_days else []
+        else:
+            for day in days_of_week:
+                if day in active_days:
+                    blacklist_per_day[day] = random.sample(all_exercises, random.randint(5, 15))
+                else:
+                    blacklist_per_day[day] = []
+
+    # 5. Base thresholds
+    base_max_threshold = random.randrange(5,14) if random.randrange(1,6) == 1 else 8.0
+    target_sets_per_muscle = random.randrange(8,24) if random.randrange(1,6) == 1 else 18.0
+
+    return {
+        "time_per_day": time_per_day,
+        "equipment_per_day": equipment_per_day,
+        "blacklist_per_day": blacklist_per_day,
+        "base_max_threshold": base_max_threshold,
+        "target_sets_per_muscle": target_sets_per_muscle,
+    }
 
 #endregion === Synthetic Generators ===
 #region === Displays ===
@@ -336,35 +435,14 @@ def display_weekly_schedule(week_schedule, musclesDataFrame):
 
 exercisesDF, musclesDF, equipmentDF = fullProcessData()
 
-# Example arguments
-time_per_day = {"Monday": 90, "Tuesday": 90, "Wednesday": 90, "Thursday": 90, "Friday": 90, "Saturday": 90, "Sunday": 90}
-equipment_per_day = {
-    "Monday": ["Dumbbell", "Body Weight"],
-    "Tuesday": ["Cable", "Barbell"],
-    "Wednesday": ["Cable", "Barbell"],
-    "Thursday": ["Dumbbell", "Lever"],
-    "Friday": ["Smith", "Weighted"],
-    "Saturday": ["Smith", "Weighted"],
-    "Sunday": ["Body Weight", "Suspension"],
-}
-blacklist_per_day = {
-    "Monday": ["Push-up"],
-    "Tuesday": [],
-    "Wednesday": [],
-    "Thursday": ["Pull-up"],
-    "Friday": [],
-    "Saturday": [],
-    "Sunday": [],
-}
 
-# Call the function
-week_schedule = genSyntheticWeek(
-    exercisesDF,
-    musclesDF,
-    equipmentDF,
-    time_per_day,
-    equipment_per_day,
-    blacklist_per_day
-)
-
-display_weekly_schedule(week_schedule=week_schedule,musclesDataFrame=musclesDF)
+for i in range(50):
+    userInput = genRandomUserInput(exercisesDF,equipmentDF)
+    routine = genSyntheticWeek(exercisesDF,musclesDF,equipmentDF,time_per_day=userInput["time_per_day"],
+                               equipment_per_day=userInput["equipment_per_day"],
+                               blacklist_per_day=userInput["blacklist_per_day"],
+                               base_max_threshold=userInput["base_max_threshold"],
+                               target_sets_per_muscle=userInput["target_sets_per_muscle"])
+    print(userInput)
+    display_weekly_schedule(routine,musclesDataFrame=musclesDF)
+    print("\n\n\n\n")
