@@ -126,13 +126,13 @@ def fixMuscleValues(exerciseDataFrame):
         return muscle_string
 
     # First, we apply some corrections due to inconsistent comma inclusion in the dataset
-    columnsToProcess = ["Target_Muscles", "Synergist_Muscles"]
+    columnsToProcess = ["Target_Muscles"]
     for column in columnsToProcess:
         exerciseDataFrame[column] = exerciseDataFrame[column].apply(
             lambda x: applyMuscleCorrections(x)
         )
 
-    # Now we process our muscle columns, which may contain, multiple values into lists.
+    # Now we process our muscle columns, which may contain multiple values into lists.
     for column in columnsToProcess:
         exerciseDataFrame[column] = exerciseDataFrame[column].apply(
             lambda x: [item.strip() for item in str(x).split(",") if item.strip()] if pd.notnull(x) else []
@@ -144,7 +144,6 @@ def fixMuscleValues(exerciseDataFrame):
 # then removes the original muscles features. Assumes muscle values have been fixed by fixMusclesValues.
 # Multi-hot encodes muscles with distinction:
 #     1 = Target muscle
-#     2 = Synergist muscle
 #     0 = None
 def multiHotEncodeMuscles(exerciseDataFrame):
     # Generate a set of all unique muscles values in ONLY Target_Muscles.
@@ -375,11 +374,17 @@ def fullProcessData():
     uniqueEquipment = getUniqueValuesInColumn(exerciseDataFrame, columnName="Equipment", isValueList=False)
     exerciseDataFrame = multiHotEncodeAndMergeEquipment(exerciseDataFrame)
 
-    # Finally, we apply any manual renaming changes as specified in manual_exercise_renames.csv
+    # Now we apply any manual renaming changes as specified in manual_exercise_renames.csv
     exerciseDataFrame = applyManualExerciseRenaming(exerciseDataFrame)
 
     # Also, rename "Main_muscle" to "Muscle Group" for consistency
     exerciseDataFrame.rename(columns={'Main_muscle': 'Muscle Group'}, inplace=True)
+
+    # Add in an arbitrary "time per set", which is identical for all exercises atm.
+    exerciseDataFrame["Time Per Set"] = 1
+
+    #for uniqueMuscle in uniqueMuscles:
+    #    print(f"{uniqueMuscle}: {exerciseDataFrame[uniqueMuscle].sum()}")
 
     generateDuplicateExerciseNameReport(exerciseDataFrame, groupColumns=list(uniqueMuscles) + list(uniqueEquipment))
     generateUniqueValueReport(exerciseDataFrame,blacklistColumns=list(uniqueMuscles) + list(uniqueEquipment))
@@ -403,11 +408,8 @@ def fullProcessData():
 
 #endregion === Data Processing ===
 
-exercises, muscles, equipment = fullProcessData()
 
-print(exercises.head(10).to_string())
-print("===============================")
-print(muscles.to_string())
-print("===============================")
-print(equipment.to_string())
-print("===============================")
+
+
+#exercise, muscles, equipment = fullProcessData()
+#print(exercise[exercise["Wrist Extensors"] > 0].to_string())
