@@ -1,17 +1,11 @@
 from workout_model.data.preparation import fullProcessData
 import random
+import math
 
-def genSyntheticDay(
-    exerciseDataFrame,
-    musclesDataFrame,
-    equipmentDataFrame,
-    time,
-    musclesToHit,
-    maximumMuscleUsageThreshold=8.0,
-    equipmentAvailable=None,  # None means all equipment is available
-    exerciseBlacklist=None,  # None means no exercises are blacklisted
-    max_attempts=100  # Maximum attempts to add exercises to prevent infinite loops
-):
+def genSyntheticDay(exerciseDataFrame,musclesDataFrame,equipmentDataFrame,time,musclesToHit,maximumMuscleUsageThreshold=8.0,
+                    equipmentAvailable=None,  # None means all equipment is available
+                    exerciseBlacklist=None,  # None means no exercises are blacklisted
+                    max_attempts=100):  # Maximum attempts to add exercises to prevent infinite loops
     # Normalize inputs
     if equipmentAvailable is None:
         equipmentAvailable = equipmentDataFrame["Equipment"].tolist()  # All equipment available
@@ -118,6 +112,94 @@ def genSyntheticDay(
 
     return routine, muscle_usage
 
+
+def genSyntheticWeek(
+        musclesDataFrame,  # DataFrame of all muscles
+        time_per_day,  # Dictionary: {"Monday": 45, "Tuesday": 30, ...}
+        equipment_per_day,  # Dictionary: {"Monday": ["Dumbbell", ...], ...}
+        blacklist_per_day,  # Dictionary: {"Monday": ["Push-up", ...], ...}
+        total_weekly_time_limit=None,  # Optional total weekly time limit
+        base_max_threshold=8.0,  # Default daily threshold
+        target_sets_per_muscle=18  # Target weekly sets per muscle
+):
+    # Days of the week
+    days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+
+    # Extract all unique muscles
+    all_muscles = musclesDataFrame["Muscle"].tolist()
+
+    # Filter for days with actual time available
+    valid_days = [day for day in days if time_per_day.get(day, 0) > 0]
+    total_days_available = len(valid_days)
+    total_time_available = sum(time_per_day.get(day, 0) for day in valid_days)
+
+    # Estimate required time to hit all muscles once
+    estimated_required_time = len(all_muscles) * (target_sets_per_muscle / 7) * 3  # Average 3 mins per set/rest config
+
+    # Determine surplus ratio
+    time_surplus_ratio = total_time_available / estimated_required_time
+
+    # Distribute muscles across available days
+    muscles_per_day = math.ceil(len(all_muscles) / total_days_available)
+    muscle_assignments = {day: [] for day in valid_days}
+
+    shuffled_muscles = all_muscles.copy()
+    random.shuffle(shuffled_muscles)
+
+    # Initial assignment
+    for i, muscle in enumerate(shuffled_muscles):
+        muscle_assignments[valid_days[i % total_days_available]].append(muscle)
+
+    # Reassign some muscles if surplus time allows
+    if time_surplus_ratio > 1.3:  # Allow reassigning if surplus time is significant
+        surplus_days = [
+            day for day in valid_days if time_per_day[day] > (estimated_required_time / total_days_available)
+        ]
+
+        extra_muscles = shuffled_muscles.copy()
+        random.shuffle(extra_muscles)
+
+        for day in surplus_days:
+            muscles_to_reassign = extra_muscles[:muscles_per_day // 2]  # Add ~50% of initial daily muscles
+            muscle_assignments[day].extend(muscles_to_reassign)
+            extra_muscles = extra_muscles[muscles_per_day // 2:]
+
+    # Calculate maximumMuscleUsageThreshold for each day
+    def calculate_max_threshold(days_available, time_available):
+        if days_available >= 6:
+            return base_max_threshold  # Conservative for many days
+        elif 4 <= days_available < 6:
+            return base_max_threshold + 2  # Moderate flexibility
+        elif 2 <= days_available < 4:
+            return base_max_threshold + 4  # High flexibility
+        else:  # 1 day available
+            return base_max_threshold + 6  # Very high flexibility
+
+    # Prepare arguments for each day
+    week_schedule = {}
+    for day in valid_days:
+        time_available = time_per_day[day]
+        equipment_available = equipment_per_day.get(day, [])
+        exercise_blacklist = blacklist_per_day.get(day, [])
+
+        # Calculate the max threshold based on the total days and available time
+        max_threshold = calculate_max_threshold(total_days_available, time_available)
+
+        # Assign muscles to this day
+        muscles_to_hit = muscle_assignments[day]
+
+        # Create the day's argument list
+        week_schedule[day] = {
+            "time": time_available,
+            "equipmentAvailable": equipment_available,
+            "exerciseBlacklist": exercise_blacklist,
+            "musclesToHit": muscles_to_hit,
+            "maximumMuscleUsageThreshold": max_threshold,
+        }
+
+    return week_schedule
+
+
 # Helper function for neatly displaying the results of a routine.
 def display_routine(routine, exerciseDataFrame, muscleDataFrame, show_muscle_performance=False):
     print("=" * 50)
@@ -195,7 +277,46 @@ def display_routine(routine, exerciseDataFrame, muscleDataFrame, show_muscle_per
             print(f"{muscle} ({muscle_group}): {usage:.1f} sets")
 
         print("=" * 50)
+def display_weekly_schedule(week_schedule, musclesDataFrame):
+    print("=" * 50)
+    print("WEEKLY WORKOUT SCHEDULE")
+    print("=" * 50)
 
+    # Initialize muscle hit tracking
+    muscle_hit_summary = {muscle: 0 for muscle in musclesDataFrame["Muscle"].tolist()}
+
+    # Loop through each day and display the schedule
+    for day, schedule in week_schedule.items():
+        print(f"{day.upper()}")
+        print("-" * 50)
+        print(f"Time Available: {schedule['time']} minutes")
+        print(f"Equipment Available: {', '.join(schedule['equipmentAvailable']) if schedule['equipmentAvailable'] else 'None'}")
+        print(f"Exercise Blacklist: {', '.join(schedule['exerciseBlacklist']) if schedule['exerciseBlacklist'] else 'None'}")
+        print(f"Maximum Muscle Usage Threshold: {schedule['maximumMuscleUsageThreshold']}")
+        print("Muscles to Hit:")
+        muscles_with_groups = [
+            (muscle, musclesDataFrame[musclesDataFrame["Muscle"] == muscle]["Muscle Group"].iloc[0])
+            for muscle in schedule["musclesToHit"]
+        ]
+        for muscle, group in muscles_with_groups:
+            print(f"   - {muscle} ({group})")
+
+        # Update muscle hit summary
+        for muscle in schedule["musclesToHit"]:
+            muscle_hit_summary[muscle] += 1
+
+        print("=" * 50)
+
+    # Display muscle hit summary
+    print("\nMUSCLE PERFORMANCE REVIEW")
+    print("=" * 50)
+    print(f"{'Muscle':<30}{'Muscle Group':<20}{'Days Hit':>10}")
+    print("-" * 60)
+    for muscle in musclesDataFrame["Muscle"].tolist():
+        days_hit = muscle_hit_summary[muscle]
+        muscle_group = musclesDataFrame[musclesDataFrame["Muscle"] == muscle]["Muscle Group"].iloc[0]
+        print(f"{muscle:<30}{muscle_group:<20}{days_hit:>10}")
+    print("=" * 50)
 
 # Build dataframes
 exercisesDF, musclesDF, equipmentDF = fullProcessData()
@@ -217,9 +338,40 @@ musclesToTarget = ["Latissimus Dorsi",
         "Brachialis"]
 
 # Generate day routine
-thisRoutine, updated_muscles_hit = genSyntheticDay(exercisesDF,musclesDF,equipmentDF,time=6,musclesToHit=musclesToTarget,
-                                                   equipmentAvailable=availableEquipment)
-display_routine(thisRoutine,exercisesDF,musclesDF,show_muscle_performance=True)
+#for i in range(50):
+#    thisRoutine, updated_muscles_hit = genSyntheticDay(exercisesDF,musclesDF,equipmentDF,time=30,musclesToHit=musclesToTarget,
+#                                                       equipmentAvailable=availableEquipment)
+#    print(thisRoutine)
+#    #print(updated_muscles_hit)
 
-print("\n\n\n")
-print(updated_muscles_hit)
+
+# Example arguments
+time_per_day = {"Monday": 90, "Tuesday": 90, "Wednesday": 90, "Thursday": 90, "Friday": 90, "Saturday": 90, "Sunday": 90}
+equipment_per_day = {
+    "Monday": ["Dumbbell", "Body Weight"],
+    "Tuesday": ["Cable", "Barbell"],
+    "Wednesday": ["Cable", "Barbell"],
+    "Thursday": ["Dumbbell", "Lever"],
+    "Friday": ["Smith", "Weighted"],
+    "Saturday": ["Smith", "Weighted"],
+    "Sunday": ["Body Weight", "Suspension"],
+}
+blacklist_per_day = {
+    "Monday": ["Push-up"],
+    "Tuesday": [],
+    "Wednesday": [],
+    "Thursday": ["Pull-up"],
+    "Friday": [],
+    "Saturday": [],
+    "Sunday": [],
+}
+
+# Call the function
+week_schedule = genSyntheticWeek(
+    musclesDF,
+    time_per_day,
+    equipment_per_day,
+    blacklist_per_day
+)
+
+display_weekly_schedule(week_schedule=week_schedule,musclesDataFrame=musclesDF)

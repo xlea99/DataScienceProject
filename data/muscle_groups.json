@@ -51,6 +51,14 @@
       ]
     },
     {
+      "name": "Neck",
+      "entries": [
+        "Sternocleidomastoid",
+        "Splenius",
+        "Levator Scapulae"
+      ]
+    },
+    {
       "name": "Shoulder",
       "entries": [
         "Anterior Deltoid",
