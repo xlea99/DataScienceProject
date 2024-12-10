@@ -5,11 +5,6 @@ import json
 import pandas as pd
 from sklearn.model_selection import train_test_split
 import tensorflow as tf
-from tensorflow.keras.preprocessing.text import Tokenizer
-from tensorflow.keras.preprocessing.sequence import pad_sequences
-from tensorflow.keras.callbacks import ModelCheckpoint
-from tensorflow.keras.models import Model
-from tensorflow.keras.layers import Input, Embedding, LSTM, Dense
 import numpy as np
 import os
 
@@ -72,8 +67,6 @@ def sequenceDataOutput(dataOutput):
             sequence.extend([exercise["name"], exercise["config"], "|"])
 
     return sequence
-
-
 
 #endregion === Data Flattening/Expanding ===
 #region === Efficiency Scoring ===
@@ -226,17 +219,13 @@ def generateTrainingDataFrame(exercisesDataFrame, musclesDataFrame, equipmentDat
     df = pd.DataFrame(data)
     return df
 
-
 #endregion === Training Data ===
-
-
 
 def process_data():
     print("Processing data...")
     exercisesDF, musclesDF, equipmentDF = fullProcessData()
     print("Data processing complete.")
     return exercisesDF, musclesDF, equipmentDF
-
 
 def generate_synthetic_dataset(exercisesDF, musclesDF, equipmentDF, num_samples=50, save_path=None):
     print(f"Generating synthetic dataset with {num_samples} samples...")
@@ -335,7 +324,6 @@ def tokenize_and_pad(train_df, val_df):
     print("Tokenization and padding complete.")
     return (input_padded, output_padded, val_input_padded, val_output_padded, input_tokenizer, output_tokenizer)
 
-
 def build_seq2seq_model(input_vocab_size, output_vocab_size, embedding_dim=256, lstm_units=512):
     print("Building Seq2Seq model...")
 
@@ -361,7 +349,6 @@ def build_seq2seq_model(input_vocab_size, output_vocab_size, embedding_dim=256, 
     seq2seq_model = tf.keras.Model([encoder_inputs, decoder_inputs], decoder_outputs)
     print("Seq2Seq model built.")
     return seq2seq_model, encoder_states
-
 
 def compile_and_train_model(seq2seq_model, input_padded, output_padded, val_input_padded, val_output_padded, train_df, save_path=None):
     print("Compiling model...")
@@ -467,7 +454,6 @@ def infer(input_seq, encoder_model, decoder_model, input_tokenizer, output_token
         print("Sampled token:", sampled_token)
 
     return " ".join(decoded_sentence)
-
 
 def run_workflow():
     # Define paths

@@ -9,7 +9,7 @@
   "Teres Minor": "accessory",
   "Infraspinatus":  "accessory",
   "Subscapularis": "accessory",
-  "Soleus":  "priority",
+  "Soleus":  "accessory",
   "Gastrocnemius": "priority",
   "Tibialis Anterior":  "accessory",
   "Pectoralis Major Clavicular": "priority",
