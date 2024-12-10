@@ -3,18 +3,18 @@
     {
       "name": "Cable Machine",
       "entries": ["Cable","Cable (pull side)","Cable Standing Fly"],
-      "setupTime": 0.0
+      "setupTime": 1.0
     },
     {
       "name": "Smith",
       "entries": ["Smith"],
-      "setupTime": 1.0
+      "setupTime": 0.0
     },
     {
       "name": "Specific-Purpose Gym Machine",
       "entries": ["Lever","Lever (selectorized)","Lever (selectorized) Chest Dip","Lever (plate loaded)",
       "Sled","Sled (selectorized)","Sled (plate loaded)","Assisted (machine)","Assisted (partner)"],
-      "setupTime": 0.0
+      "setupTime": 1.0
     },
     {
       "name": "Band",
@@ -29,7 +29,7 @@
     {
       "name": "No Equipment",
       "entries": ["Body Weight","Isometric","Self-assisted"],
-      "setupTime": 0.0
+      "setupTime": 1.0
     },
     {
       "name": "Dumbbell",
@@ -39,7 +39,7 @@
     {
       "name": "Barbell",
       "entries": ["Barbell"],
-      "setupTime": 1.0
+      "setupTime": 0.0
     },
     {
       "name": "Suspension Trainer",
