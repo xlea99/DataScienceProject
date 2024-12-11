@@ -1,5 +1,6 @@
 import random
 import math
+from workout_model.data.preparation import fullProcessData
 
 #region === Synthetic Generators ===
 

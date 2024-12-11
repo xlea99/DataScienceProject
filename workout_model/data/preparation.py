@@ -15,6 +15,7 @@ def readGymExerciseCSV():
 # This function simply drops the unneeded columns from the dataframe, divides multi-entry cells into lists, and
 # removes columns listed as variations.
 def initialClean(exerciseDataFrame):
+    print(exerciseDataFrame.head(50).to_string())
     # Remove unneeded columns.
     exerciseDataFrame = exerciseDataFrame.drop(columns=["Preparation","Execution","Force","Secondary Muscles",
                                                                 "Stabilizer_Muscles","Antagonist_Muscles","Variation",
@@ -411,5 +412,6 @@ def fullProcessData():
 
 
 
-#exercise, muscles, equipment = fullProcessData()
-#print(exercise[exercise["Wrist Extensors"] > 0].to_string())
+exercise, muscles, equipment = fullProcessData()
+
+print(exercise.columns.tolist())

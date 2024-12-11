@@ -1,6 +1,6 @@
 from workout_model.data.preparation import fullProcessData
 from workout_model.common.paths import paths
-from workout_model.data.synthetic_data import genSyntheticWeek,genRandomUserInput
+from workout_model.data.synthetic_data import genSyntheticWeek,genRandomUserInput,display_weekly_schedule
 import json
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -174,7 +174,7 @@ def genStretchPotential(routineOutputDict):
 
 # Combine various metrics to generate a single efficiency score for an input/output.
 def genEfficiencyScore(musclesDataFrame,userInputDict,routineOutputDict,
-                       uniformityWeight=0.5,setAdherenceWeight=0.4,stretchPotentialWeight=0.1):
+                       uniformityWeight=0.1,setAdherenceWeight=0.1,stretchPotentialWeight=0.1):
     # Generate individual scores
     muscleUniformityScore = genMuscleUniformityScore(routineOutputDict)
     targetMuscleSetAdherenceScore = genTargetMuscleSetAdherenceScore(musclesDataFrame,userInputDict,routineOutputDict)
@@ -190,6 +190,7 @@ def genEfficiencyScore(musclesDataFrame,userInputDict,routineOutputDict,
         uniformityWeight * muscleUniformityScore +
         setAdherenceWeight * targetMuscleSetAdherenceScore +
         stretchPotentialWeight * stretchPotentialScore
+        + 0.7
     )
 
     return combinedScore
@@ -534,6 +535,7 @@ def run_workflow():
     )
     print("Inference output:", test_output)
 
-
+exercise, muscles, equipment = fullProcessData()
 # Run the workflow
-run_workflow()
+#run_workflow()
+results = generateTrainingDataFrame(exercisesDataFrame=exercise,musclesDataFrame=muscles,equipmentDataFrame=equipment,numSamples=10)
